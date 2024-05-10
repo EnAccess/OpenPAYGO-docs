@@ -22,7 +22,7 @@ function HomepageHeader() {
           </Link>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/quick-start-guide"
+            to="/docs/openpaygo-token/setting_up_openpaygo"
           >
             Get Started 🚀
           </Link>
