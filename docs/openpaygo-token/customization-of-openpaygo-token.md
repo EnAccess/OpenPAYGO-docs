@@ -1,82 +1,8 @@
 ---
-sidebar_position: 1
+sidebar_position: 4
 ---
 
-# General Documentation
-
-## Description of the business need
-
-This project targets manufacturer that want to add a Pay-As-You-Go (PAYGO) feature to their product. They can use the hardware examples to add a hardware control feature (e.g. a switch to control the load) and use this token system as a secure way to remotely control the activation of the devices via a token.
-
-The token system consists of a way of generating tokens containing a certain number of days to be activated on a unit (which will be generated on a server), and a way to verify that a token is valid and extract the number of days to be activated (which will be done in the device).
-
-The token generation part of the system can then be integrated with a software platform such as PaygOps or any other software platform.
-The token validation part can be integrated in virtually any device.
-
-## License
-
-While projects financed by EnAccess usually use an MIT license for maximum openness, this project is using an Apache 2.0 license that adds the additional restriction over MITlicense that changes made to the code have to be documented when used in other projects. We have chosen to do this to avoid having projects using this token system with modification that break compatibility with no mention that they are not compatible, hence leading to confusion.
-
-## General requirements for the use case
-
-- The activation token should be able to contain 2 years worth of activation time (and should be able to use more tokens after that period to add more time, up to at least 10 years).
-- The activation tokens should be able to both add and remove days from a system (presenting advantages over most currently existing solution).
-- The tokens should also be able to enable or disable the PAYGO mode at will
-- The token system should be extensible to add certain commands required by some devices (but that do not need standardisation, e.g. "Enable High Power mode").
-- The code should be reasonably secure; trying to type the same code twice, taking a code from a neighbour or typing codes randomly should not succeed (or extremely rarely).
-- The token generator (the server), will be given some starting data for each device that are defined by the manufacturer. This includes a key (that can be shared for a whole batch or not) as well as a serial number and a "starting code" for each device. Aspecific format for this data based on CSV shall be specified to ensure interoperability.
-- The token verification (the unit) will know its "starting code" and the key and will extract the number of days to be activated from the code
-- The codes should ideally be 9 digits longs to make successful entry by end user more likely
-- For devices with limited space and without the options for infrared remotes, having the ability to enter codes using only digits 1 to 4 should be possible (at the expense of accepting a longer 15 digit code).
-
-## Target minimum hardware requirements for the token verification part
-
-- An MCU with at least 8KB of AVAILABLE flash (after the rest of the firmware functions are implemented). It is also possible to use a separate dedicated MCU that will communicate with your main MCU but this entirely depends on your design requirements and choices of MCU.
-- A keypad input method (either Infrared Receiver and Infrared remote, an actual membrane keypad, or a USB port to which a USB keyboard can be connected). It should preferably have at least 12 buttons, but 10 buttons or even 4 buttons can be sufficient.
-- A hardware Real Time Clock (RTC) that is accurate enough to drift by a non- noticeable time over 12 months (usually less than 6h would be good). However, there is no need for the RTC to be configured with the actual real time, it is only required that the timestamp obtained from the RTC keeps going up constantly by 1 every second with minimal drift.
-- An EEPROM or other memory on which permanent data can be stored (such as the serial number, device keys, PAYG status, etc.). Flash can be used as long as proper care is taken to make sure the lifetime of the used flash blocks is sufficient
-- A UART or other communication interface that allows the "starting code" and key to be set in factory. Alternatively, some other way to have different firmware for each unit can be used (e.g. factory flashed MCUs with procedure to set different values in flash for each device).
-- If the device can be disconnected from the battery, also make sure that:
-- The RTC can be powered by a backup battery to not be reset and keep running when the battery is disconnected
-- There are backup registers with at least 96 bits that are kept by the backup battery when the power is disconnected (but lost if the backup battery is not present and the RTC stops running). This is used for the storage of key values that are frequently changing.
-
-## Example implementation provided
-
-An example implementation both on the server side and on the device side is provided with this documentation. It should allow you to just copy and paste most of the code into the firmware of your device and only adapt parts of the codes (which are purposely placeholders using Unix libraries to allow simulation on a computer) to match the actual hardware of your device (mainly the code to read the keypad presses, blink the LEDs and to access the RTCand memory). For more details, see below after the description of the solution.
-
-## Simplified description of the solution
-
-The code system is based on codes that contain a unique "Activation Value" that the device for which it was generated can find. The code also contains a "count" that increments by one each time a code is generated on the server.
-
-The decoder makes sure that the code entered has a count that is higher than its current count but only up to 30 higher for security reasons. This number can be decreased significantly to improve security, although there is a compromise in terms of usability in case the clients loses enough intermediary codes that the new code is then considered invalid. This ensures that entering a code already used will not add more days again. The decoder then extracts the activation value from the code and returns it to the rest of the system.
-
-## Encoding of the value
-
-The value is encoded in the last 3 digits of the code by masking the value in the "starting code". This is done by adding the value to the last 3 digits of the "starting code", if the resulting value is over 999, then 1000 is subtracted from the value. For example, if the code is "123456**789**" and the value to be encoded is 50, the resulting code with value encoded would be "123456**839**".
-
-The decoding is done by subtracting the "starting code" base (the last 3 digit) to the base (last 3 digits) of the received code. For example, if the received code is 123456829, the base is 829. Subtracting 789 from 829 gives us 40 which is the value. If the value obtained is negative, then 1000 needs to be added.
-
-## Decoding the code on the device
-
-1. Decode the value form the input code.
-1. Generate the "base code" by adding encoding that value into the starting code following the steps in the "encoding of the value" section
-1. Pass the "base code" X times through the "code generation function", Xbeing the last count + 30, at each iteration:
-   1. Replace the "code base" in the resulting code with the "encoded code base". For example, if the resulting code from step 3 is "234567**890**", then the final code would be "234567**839**" (if the value to be encoded is 50 and the base 789 like in the example above)
-   1. If the current X is strictly higher than the last count, we compare the resulting code to the input code, if they match. If it matches, then the code is valid and we return the value. If not we continue iterating
-1. If the end of the loop is reached and no match was found, the code was invalid (either already used or properly invalid).
-
-## Description of the code generation function
-
-The function only takes a 32 bits integer no bigger than 999999999 as a parameter, and returns a similar integer.
-
-Computational steps for code generation:
-
-1. Copy the input integer twice (big endianness) turning the 32bits (4 bytes) into 8 bytes
-1. Generate the SipHash-2-4 hash of the those 8 bytes with the key
-1. Split the resulting hash into 2 parts of 32 bits
-1. XOR the two parts together
-1. Remove the top 2 Most Significant Bits from the result of the XORing above (leaving the 30 LSBits)
-1. If the resulting value is over 999999999, subtract 73741825 to the value, this leaves 29.5 effective bits of entropy
+# Customization of OpenPAYGO Tokens
 
 ## Description of the use of the decoded values
 
@@ -171,6 +97,49 @@ In that case, if the count of the token entered is below the highest count, but 
 
 However, the entry of older tokens should ONLYbe permitted for Add-Time tokens, in no cases should the entry of an Add-Time token older than another type of token be allowed (e.g. Set-Time token be allowed as it would defeat the purpose of the Set-Time token (e.g. removing days added by mistake). Care should also be taken to prevent the entry of any tokens older than a Counter Sync or Disable PAYG token as well.
 
+## Roll Out Considerations for OpenPAYGO Tokens
+
+### Description of the Device Setup parameters
+
+| Parameter                        | Description                                                                                                                                                                                             |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Serial Number                    | Defined by the manufacturer, not actually used inside the device but required as a single unique identifier for PAYGplatforms.                                                                          |
+| Starting Code                    | Defined by the manufacturer, should be random for each device and 9 digits long.                                                                                                                        |
+| Key                              | Defined by the manufacturer, can be different for each device but does not have to be, it can be unique for a manufacturer or a distributor for convenience.                                            |
+| Time Divider (Optional)          | Defining the division factor (from 1 day) to be applied to the activation value. Acceptables values are 1 to 255. If not specified, the default value should be 1.                                      |
+| Restricted Digit Mode (Optional) | If set to 1 the tokens generated will only use digits between 1 and 4, if set to 0 or not set, it will use the regular set of digit between 0 and 9.                                                    |
+| Count (Optional)                 | If set, the count of the device will be initialized with that value, the default value is 1. Using another random value between 1 and 10 can help improve security. The count is needed for migrations. |
+| Test Code (Optional)             | It is not technically an OpenPAYGO valid token but will be used by the software platform to avoid clash (see note below)                                                                                |
+
+### Code Values Table
+
+| Code Value | Usage                                                                                                                                                                                                            |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0-995      | Activation value from 0 to 995, it either adds that value or sets that value based on the count parity. If it sets that value to any value while the device is in PAYG disabled state it will enable PAYG again. |
+| 996        | RESERVED                                                                                                                                                                                                         |
+| 997        | RESERVED                                                                                                                                                                                                         |
+| 998        | Disable PAYG                                                                                                                                                                                                     |
+| 999        | Counter synchronisation                                                                                                                                                                                          |
+
+### Format for setup parameters communication
+
+To ensure smooth communication between the device manufacturers and the software provider or in between software providers when migrating, we recommend following a particular template. It is available in the file "example_device_list. csv".
+It is important that the CSV be encoded using actual comma separator "," and a carriage return for line separation. It is also important that the first line (the header) is kept and that all the columns appear even if they are empty (the default value as defined above will then be used).
+
+### Important consideration on Serial Numbers
+
+While serial numbers are not actually used inside the device or by the OpenPAYGO Token system, they are required as a single unique identifier for PAYG platforms. For that reason we highly recommend the following measures:
+
+1. **Print the serial numbers very visibly on the devices:** both Agents and Clients will often need to find them for usage with the PAYG platform (e.g. as payment reference)
+1. **Include a prefix related to your brand in the serial number:** this will prevent different products from different manufacturers having the same serial number. For example, if your brand is "SuperLight" you can use the prefix "SLT" prefix and have serial numbers that look like this: SLT30000123 hence making serial number clashes a lot less likely.
+1. **Be sure to use the same format of serial numbers everywhere:** make sure that the serial number format that you use as printed on your device, on the box, on the CSV list, etc. always have the same format to avoid confusion. For example avoid printing "30000123" but then having "SLT30000123" in the CSVto avoid confusing clients.
+
+### Test codes
+
+In some cases, in particular during testing, manufacturers might find it useful to have a "test code" that activate the device for a short period of time (enough to test the device, but not enough to be useful to an end user, typically 30 seconds). It is often useful that these test codes are shared by a whole batch of devices to facilitate testing. We recommend for security purposes to limit the use of those codes, for example preventing the use of the test code more than 5 times every 60 minutes.
+
+In any case, those test codes do not have the same constraints as the regular codes. We recommend to directly check for them in the code and bypass the OpenPAYGO Token logic entirely for those test codes. To avoid clash with OpenPAYGO Token, we still recommend that this test code be provided in the CSV spreadsheet to the software provider, so that if by chance an actual token was the same as the test code, the count could be increased to generate an alternate token.
+
 ## Security Considerations
 
 ### Waiting period for invalid tokens
@@ -196,44 +165,3 @@ Device manufacturers should not neglect the risk of hardware attacks, particular
 ### Security Audit
 
 For more information about security risks and mitigation, see the "Security Audit" document.
-
-## Description of the Device Setup parameters
-
-| Parameter                        | Description                                                                                                                                                                                             |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Serial Number                    | Defined by the manufacturer, not actually used inside the device but required as a single unique identifier for PAYGplatforms.                                                                          |
-| Starting Code                    | Defined by the manufacturer, should be random for each device and 9 digits long.                                                                                                                        |
-| Key                              | Defined by the manufacturer, can be different for each device but does not have to be, it can be unique for a manufacturer or a distributor for convenience.                                            |
-| Time Divider (Optional)          | Defining the division factor (from 1 day) to be applied to the activation value. Acceptables values are 1 to 255. If not specified, the default value should be 1.                                      |
-| Restricted Digit Mode (Optional) | If set to 1 the tokens generated will only use digits between 1 and 4, if set to 0 or not set, it will use the regular set of digit between 0 and 9.                                                    |
-| Count (Optional)                 | If set, the count of the device will be initialized with that value, the default value is 1. Using another random value between 1 and 10 can help improve security. The count is needed for migrations. |
-| Test Code (Optional)             | It is not technically an OpenPAYGO valid token but will be used by the software platform to avoid clash (see note below)                                                                                |
-
-## Code Values Table
-
-| Code Value | Usage                                                                                                                                                                                                            |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0-995      | Activation value from 0 to 995, it either adds that value or sets that value based on the count parity. If it sets that value to any value while the device is in PAYG disabled state it will enable PAYG again. |
-| 996        | RESERVED                                                                                                                                                                                                         |
-| 997        | RESERVED                                                                                                                                                                                                         |
-| 998        | Disable PAYG                                                                                                                                                                                                     |
-| 999        | Counter synchronisation                                                                                                                                                                                          |
-
-## Format for setup parameters communication
-
-To ensure smooth communication between the device manufacturers and the software provider or in between software providers when migrating, we recommend following a particular template. It is available in the file "example_device_list. csv".
-It is important that the CSV be encoded using actual comma separator "," and a carriage return for line separation. It is also important that the first line (the header) is kept and that all the columns appear even if they are empty (the default value as defined above will then be used).
-
-## Important consideration on Serial Numbers
-
-While serial numbers are not actually used inside the device or by the OpenPAYGO Token system, they are required as a single unique identifier for PAYG platforms. For that reason we highly recommend the following measures:
-
-1. **Print the serial numbers very visibly on the devices:** both Agents and Clients will often need to find them for usage with the PAYG platform (e.g. as payment reference)
-1. **Include a prefix related to your brand in the serial number:** this will prevent different products from different manufacturers having the same serial number. For example, if your brand is "SuperLight" you can use the prefix "SLT" prefix and have serial numbers that look like this: SLT30000123 hence making serial number clashes a lot less likely.
-1. **Be sure to use the same format of serial numbers everywhere:** make sure that the serial number format that you use as printed on your device, on the box, on the CSV list, etc. always have the same format to avoid confusion. For example avoid printing "30000123" but then having "SLT30000123" in the CSVto avoid confusing clients.
-
-## Test codes
-
-In some cases, in particular during testing, manufacturers might find it useful to have a "test code" that activate the device for a short period of time (enough to test the device, but not enough to be useful to an end user, typically 30 seconds). It is often useful that these test codes are shared by a whole batch of devices to facilitate testing. We recommend for security purposes to limit the use of those codes, for example preventing the use of the test code more than 5 times every 60 minutes.
-
-In any case, those test codes do not have the same constraints as the regular codes. We recommend to directly check for them in the code and bypass the OpenPAYGO Token logic entirely for those test codes. To avoid clash with OpenPAYGO Token, we still recommend that this test code be provided in the CSV spreadsheet to the software provider, so that if by chance an actual token was the same as the test code, the count could be increased to generate an alternate token.

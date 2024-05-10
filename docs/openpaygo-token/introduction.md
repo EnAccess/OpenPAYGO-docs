@@ -1,16 +1,31 @@
-﻿---
-sidebar_position: 3
+---
+sidebar_position: 1
 ---
 
-# How to choose the right PAYGO Technology
+# Introduction to OpenPAYGO Tokens
 
-## Introduction
+## What is the OpenPAYGO Token?
+
+This project targets manufacturer that want to add a Pay-As-You-Go (PAYGO) feature to their product. They can use the hardware examples to add a hardware control feature (e.g. a switch to control the load) and use this token system as a secure way to remotely control the activation of the devices via a token.
+
+The token system consists of a way of generating tokens containing a certain number of days to be activated on a unit (which will be generated on a server), and a way to verify that a token is valid and extract the number of days to be activated (which will be done in the device).
+
+The token generation part of the system can then be integrated with a software platform such as PaygOps or any other software platform.
+The token validation part can be integrated in virtually any device.
+
+## License
+
+While projects financed by EnAccess usually use an MIT license for maximum openness, this project is using an Apache 2.0 license that adds the additional restriction over MITlicense that changes made to the code have to be documented when used in other projects. We have chosen to do this to avoid having projects using this token system with modification that break compatibility with no mention that they are not compatible, hence leading to confusion.
+
+## Alternatives Tokens in OpenPayGo Usecase
+
+### How to choose the right PAYGO Technology
 
 When deciding to make your product pay as you go, there are several options available, and different considerations to take into account to know what is best in your situation. Below is a short presentation of the different options with their advantages, inconvenience and an opinionated view of the situations in which it is best to use them.
 
 We then go on and go into a little bit more detail about the critical choice within those different options.
 
-## Choosing the PAYGO technology category
+### Choosing the PAYGO technology category
 
 ### Keypad entry of tokens
 
