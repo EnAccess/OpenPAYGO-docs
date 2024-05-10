@@ -1,6 +1,6 @@
-# OpenPAYGO documentation website
+# OpenPAYGO Documentation Website
 
-This OpenPAYGO documentation website is built using [Docusaurus 3](https://docusaurus.io/), a modern static website generator.
+The OpenPAYGO is an open source token system to enable PAYGO functionality in new products. This repository holds [the documentation for OpenPAYGO](https://enaccess.github.io/OpenPAYGO-docs/), and it is built using [Docusaurus 3](https://docusaurus.io/), a modern static website generator.
 
 ## Pre-requisites
 
@@ -23,10 +23,14 @@ This command starts a local development server and opens up a browser window. Mo
 
 ## Deployment
 
-Deployment is done using Github Actions and does not involve manual steps.
+Deployment is done using GitHub Actions and does not involve manual steps.
 Check out `.github/workflows` folder of the root repository.
 
-## Further Read
+## Contributing to OpenPAYGO Docs
+
+We welcome contributions from the community! Whether you're interested in fixing bugs, adding new features, or improving documentation, your help is greatly appreciated. To get started, you can either check existing open issues or open a new issue, fork the repository, make your changes, and submit a pull request. If you have any questions, tag @dhmohns. 
+
+## Resources on Docusaurus
 
 - [Markdown Features](https://docusaurus.io/docs/markdown-features)
 - [Markdown Front Matter](https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-content-docs#markdown-front-matter)
