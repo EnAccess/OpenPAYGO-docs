@@ -111,7 +111,7 @@ const config = {
             position: "left",
           },
           {
-            to: "/docs/quick-start-guide",
+            to: "/docs/openpaygo-token/setting_up_openpaygo",
             label: "Get Started",
             position: "left",
           },
@@ -144,7 +144,7 @@ const config = {
             items: [
               {
                 label: "Get Started 🚀",
-                to: "/docs/quick-start-guide",
+                to: "/docs/openpaygo-token/setting_up_openpaygo",
               },
               {
                 label: "Read the documentation 📄",
