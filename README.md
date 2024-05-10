@@ -27,7 +27,6 @@ Deployment is done using GitHub Actions and does not involve manual steps.
 Check out `.github/workflows` folder of the root repository.
 
 ## Contributing to OpenPAYGO Docs
-
 We welcome contributions from the community! Whether you're interested in fixing bugs, adding new features, or improving documentation, your help is greatly appreciated. To get started, you can either check existing open issues or open a new issue, fork the repository, make your changes, and submit a pull request. If you have any questions, tag @dmohns. 
 
 ## Resources on Docusaurus
