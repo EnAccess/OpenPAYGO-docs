@@ -36,3 +36,18 @@ sidebar_position: 0
 ---
 
 Welcome to the **OpenPAYGO** documentation.
+
+## OpenPAYGO ecosystem feature availabilties
+
+The OpenPAYGO ecosystem offers a range of feautres to implement pay-as-you-go services.
+These are implemented in different programming language libraries individually.
+Not all libraries have implement the full range of features yet.
+However, contributions to add missing libraries are more than welcome.
+
+| Language    | Status       | Token | Metrics | URL                                            |
+| ----------- | ------------ | ----- | ------- | ---------------------------------------------- |
+| Python      | stable       | ✅    | ✅      | <https://github.com/EnAccess/OpenPAYGO-python> |
+| JavaScript  | beta         | ✅    | ❌      | <https://github.com/EnAccess/OpenPAYGO-js>     |
+| Go          | experimental | ✅    | ❌      | <https://github.com/EnAccess/OpenPAYGO-go>     |
+| C++ (Token) | stable       | ✅    | ❌      | <https://github.com/EnAccess/OpenPAYGO-HW>     |
+| C++ (HDK)   | stable       | ✅    | ✅      | <https://github.com/EnAccess/OpenPAYGO-HDK>    |
