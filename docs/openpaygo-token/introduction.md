@@ -6,7 +6,7 @@ sidebar_position: 1
 
 ## What is the OpenPAYGO Token?
 
-This project targets manufacturers that want to add  Pay-As-You-Go (PAYGO) feature to their product. They can use the hardware examples to add a hardware control feature (e.g. a switch to control the load) and use this token system as a secure way to remotely control the activation of the devices via a token.
+This project targets manufacturers that want to add Pay-As-You-Go (PAYGO) feature to their product. They can use the hardware examples to add a hardware control feature (e.g. a switch to control the load) and use this token system as a secure way to remotely control the activation of the devices via a token.
 
 The token system consists of a way of generating tokens containing a certain number of days to be activated on a unit (which will be generated on a server), and a way to verify that a token is valid and extract the number of days to be activated (which will be done in the device).
 
