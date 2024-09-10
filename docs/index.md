@@ -39,9 +39,9 @@ Welcome to the **OpenPAYGO** documentation.
 
 ## OpenPAYGO ecosystem feature availabilties
 
-The OpenPAYGO ecosystem offers a range of feautres to implement pay-as-you-go services.
+The OpenPAYGO ecosystem offers a range of features to implement pay-as-you-go services.
 These are implemented in different programming language libraries individually.
-Not all libraries have implement the full range of features yet.
+Not all libraries have implemented the full range of features yet.
 However, contributions to add missing libraries are more than welcome.
 
 | Language    | Status       | Token | Metrics | URL                                            |

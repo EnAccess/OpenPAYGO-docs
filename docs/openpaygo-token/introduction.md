@@ -6,7 +6,7 @@ sidebar_position: 1
 
 ## What is the OpenPAYGO Token?
 
-This project targets manufacturer that want to add a Pay-As-You-Go (PAYGO) feature to their product. They can use the hardware examples to add a hardware control feature (e.g. a switch to control the load) and use this token system as a secure way to remotely control the activation of the devices via a token.
+This project targets manufacturers that want to add Pay-As-You-Go (PAYGO) feature to their product. They can use the hardware examples to add a hardware control feature (e.g. a switch to control the load) and use this token system as a secure way to remotely control the activation of the devices via a token.
 
 The token system consists of a way of generating tokens containing a certain number of days to be activated on a unit (which will be generated on a server), and a way to verify that a token is valid and extract the number of days to be activated (which will be done in the device).
 
@@ -15,7 +15,7 @@ The token validation part can be integrated in virtually any device.
 
 ## License
 
-While projects financed by EnAccess usually use an MIT license for maximum openness, this project is using an Apache 2.0 license that adds the additional restriction over MITlicense that changes made to the code have to be documented when used in other projects. We have chosen to do this to avoid having projects using this token system with modification that break compatibility with no mention that they are not compatible, hence leading to confusion.
+While projects financed by EnAccess usually use an MIT license for maximum openness, this project is using an Apache 2.0 license that adds the additional restriction over MIT license that changes made to the code have to be documented when used in other projects. We have chosen to do this to avoid having projects using this token system with modifications that break compatibility with no mention that they are not compatible, hence leading to confusion.
 
 ## Alternatives Tokens in OpenPayGo Usecase
 
@@ -177,7 +177,7 @@ It is also recommended for very small products on which having a keypad or a por
 - Requires the client to have a WiFi network
 - Requires the client to configure the device to use that network
 
-**When to use it:** We recommend using this for product targeting wealthy market were it can be assumed that all clients will have a functioning WiFi network and the skills necessary to configure the device.
+**When to use it:** We recommend using this for products targeting wealthy markets were it can be assumed that all clients will have a functioning WiFi network and the skills necessary to configure the device.
 
 ### LoRaWAN
 
@@ -188,7 +188,7 @@ It is also recommended for very small products on which having a keypad or a por
 
 **➖ Cons:**
 
-- Requires to setup your own network infrastructure (gateways, etc.) which can be very costly
+- Requires setting up your own network infrastructure (gateways, etc.) which can be very costly
 - Technology is not very widely available and requires additional engineering effort
 
 **When to use it:** We recommend using this when the lowest cost per product is needed and when you have a significant density of clients that can justify investing in the networking infrastructure.
