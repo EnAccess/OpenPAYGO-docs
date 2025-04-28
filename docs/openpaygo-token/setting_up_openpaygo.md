@@ -66,7 +66,7 @@ This test (scenario 1) allows to quickly assess whether an implementation seems 
 7. Press `*` to start entering the token and enter the code `650975787`, this should disable PAYG on the device (it should now be active forever) and the Green LED 🟢 should blink 5 times to show it is valid.
 8. Press `*` to start entering the token and enter the code `592185789`, this should enable PAYG again on the device and set it to 0 days (not active). and the Green LED 🟢 should blink 2 times to show it is valid.
 
-## Example implementation provided
+## Example implementation provided 1
 
 An example implementation both on the server side and on the device side is provided with this documentation. It should allow you to just copy and paste most of the code into the firmware of your device and only adapt parts of the codes (which are purposely placeholders using Unix libraries to allow simulation on a computer) to match the actual hardware of your device (mainly the code to read the keypad presses, blink the LEDs and to access the RTCand memory). For more details, see below after the description of the solution.
 
@@ -103,3 +103,45 @@ Computational steps for code generation:
 1. XOR the two parts together
 1. Remove the top 2 Most Significant Bits from the result of the XORing above (leaving the 30 LSBits)
 1. If the resulting value is over 999999999, subtract 73741825 to the value, this leaves 29.5 effective bits of entropy
+
+## Example implementation provided 2
+
+### General steps to make any appliance PAYG
+
+- Open the device to access the PCB (circuit board)
+- Find a place where you can plug the relay, it must fill the following characteristics:
+    - If the line is cut, the device shouldn’t be usable. A good choice is often an internal wire going from the power connector to the PCB or going from the main PCB to some key element (e.g. motor for a pump, LCD for a TV, speaker for a speaker, etc.)
+    - It should be able to power the Arduino (5V – 12V for Arduino pro mini), if necessary, a power converter can be added to convert to the arduino voltage.
+
+- Use the positive line to:
+   - Open or close the device with the relay
+   - Power the Arduino device (with the GND line as well)
+
+- Use the negative line to:
+   - Power the Arduino device (with the positive line as well)
+
+### Connections
+
+- ### Interface connection:
+   - Depends on the interface you choose, see the “Documentation of the Arduino Hardware Configurations” for more details about the different options (IR Remote, USB Keypad, etc.).
+
+- ### Relay connection:
+    - IN RELAY -> D10 ARDUINO (ACTIVATION_PIN) 
+    - GND RELAY -> GND ARDUINO
+    - VCC RELAY -> 5V ARDUINO
+
+- ### PAYG device connection (to power the Arduino):
+    - VIN DEVICE -> VIN ARDUINO
+    - GND DEVICE -> GND ARDUINO
+
+### Few tips
+
+- When you choose the relay, make sure:
+   - It has a 5V nominal voltage so that it fits the Arduino 5V output
+   - The current it can provide is enough for the appliance you want to make
+PAYG
+
+- Most of the time, you have to choose between Normally closed and Normally Opened output for the relay, I recommend to use the Normally Opened output so that if there is an issue with the Arduino management, the user can use the device (otherwise, the user might have paid but still be unable to use the device)
+
+## Concrete Example: TV
+
